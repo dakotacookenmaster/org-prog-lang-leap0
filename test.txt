@@ -1,3 +1,1 @@
-This is a test file.
-
-<DOCTYPE html>
+This is not the same file.
