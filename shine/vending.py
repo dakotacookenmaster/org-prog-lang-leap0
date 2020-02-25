@@ -70,8 +70,16 @@ class VendingMachine():
         
         if money > self.inventory[id][2]:
             money = money - self.inventory[id][2]
-            print("Here is your change of: $" + money)
+            print("Here is your change of: $%.2f" % money)
 
+<<<<<<< HEAD
+=======
+
+    def add_item(self):
+        pass            
+        
+
+>>>>>>> 3dfa2df764df22f23759186605624c99bca3d161
     def view_inventory(self):
         # Handle dynamic title width
         string_max = 0
