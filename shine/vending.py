@@ -12,6 +12,11 @@ class VendingMachine():
         self.inventory = {}
         self.row_size = 10
         self.col_size = 10
+        self.commands = {
+            "INVENTORY": self.view_inventory,
+            "PURCHASE": self.purchase_item,
+            "ADD": self.add_item
+        }
         
         # initialize the inventory to the sizes above
         for row in range(self.row_size):
@@ -58,9 +63,9 @@ class VendingMachine():
         >>> ven.inventory["A1"] = ["Lay's Potato Chips", 0, 4.00]
         >>> ven.purchase_item("A0")
         True
-        >>> ven.purchase_item('A1")
+        >>> ven.purchase_item("A1")
         False
-        >>> ven.purchse_item("Z2")
+        >>> ven.purchase_item("Z2")
         False
         '''
         money = int(input("Please pay here: "))
@@ -72,14 +77,9 @@ class VendingMachine():
             money = money - self.inventory[id][2]
             print("Here is your change of: $%.2f" % money)
 
-<<<<<<< HEAD
-=======
-
     def add_item(self):
         pass            
-        
 
->>>>>>> 3dfa2df764df22f23759186605624c99bca3d161
     def view_inventory(self):
         # Handle dynamic title width
         string_max = 0
@@ -87,26 +87,47 @@ class VendingMachine():
             local_max = max(x) if (x := list(map(len, item))) else 0
             if local_max > string_max:
                 string_max = local_max
+        string_max += 2 # add at least one space of padding on both sides of the largest string
 
-        print("=" * (string_max // 2))
-        for item in self.inventory:
-            print(self.inventory[item])
+        inventory_string_len = string_max * 4
+        print("=" * inventory_string_len)
+        print(" Vending Machine Inventory ".center(inventory_string_len, "="))
+        print("=" * inventory_string_len)
+        print("SLOT NUMBER".center(string_max, " "), end="")
+        print("ITEM NAME".center(string_max, " "), end="")
+        print("PRICE".center(string_max, " "), end="")
+        print("QUANTITY".center(string_max, " "))
+    
+        for lst in self.inventory:
+            print(str(lst).center(string_max, " "), end="")
+            for item in self.inventory[lst]:
+                print(str(item).center(string_max, " "), end="")
+            print()
 
     def prompt(self):
-        pass
+        user_input = list(map(str.upper, input("> ").split()))
+        print(user_input)
+        if user_input[0] in self.commands:
+            print(user_input[0] + " was entered!")
+        else:
+            print(f"{user_input[0]} is not a valid command. For a list of valid commands, please type 'help'.")
 
 
-myVen = VendingMachine() 
+myVen = VendingMachine()
+while(True):
+    myVen.prompt()
+
 print(myVen.inventory)
 
 def _test():
     import doctest
-    doctest.testmod()
+    # doctest.testmod()
 
 
 if __name__ == "__main__":
     _test()
 
-myVen.inventory["A0"] = ["a", "abcdadfefaefads", "ajfoejaojfoaj9ejaojfoaadjl"]
+myVen.inventory["A0"] = ["a", "abcdadfefaefaafeafedafxeadfasdafdaefeafdsafaefads", "aojfoaadjl"]
+myVen.inventory["A1"] = ["a", "abcdadfefaefaafeafedafxeadfasdafdaefeafdsafaefads", "aojfoaadjl"]
 myVen.view_inventory()
 # {id: [name, quantity, price]}
