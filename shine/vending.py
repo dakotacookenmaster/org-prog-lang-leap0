@@ -8,6 +8,7 @@
 
 class VendingMachine():
     def __init__(self):
+        ''' Constructs a VendingMachine object and initializes the inventory to a default 10 x 10. '''
         self.inventory = {}
         self.row_size = 10
         self.col_size = 10
@@ -62,7 +63,16 @@ class VendingMachine():
         
 
     def view_inventory(self):
-        pass
+        # Handle dynamic title width
+        string_max = 0
+        for item in self.inventory.values():
+            local_max = if x := list(map(len, item)).empty()
+            if local_max > string_max:
+                string_max = local_max
+
+        print("=" * (max // 2))
+        for item in self.inventory:
+            print(self.inventory[item])
 
     def prompt(self):
         pass
@@ -81,4 +91,6 @@ def _test():
 if __name__ == "__main__":
     _test()
 
+myVen.inventory["A0"] = ["a", "abcdadfefaefads", "ajfoejaojfoaj9ejaojfoaadjl"]
+myVen.view_inventory()
 # {id: [name, quantity, price]}
