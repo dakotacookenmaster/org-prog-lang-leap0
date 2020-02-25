@@ -10,6 +10,9 @@ class VendingMachine():
     def __init__(self):
         pass
 
+    def prompt(self):
+        pass
+
     def purchase_item(self):
         pass
 
@@ -17,3 +20,4 @@ class VendingMachine():
         pass
 
 
+# {id: [name, quantity, price]}
