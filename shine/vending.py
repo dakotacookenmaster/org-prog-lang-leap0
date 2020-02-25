@@ -22,19 +22,16 @@ class VendingMachine():
     def purchase_item(self, id):
         '''purchase_item(id) --> bool;
         When passed an id, purchase_item will check if there are items in that id to purchase
-
-        >>> purchase_item('A0')
-
         '''
         keys = self.inventory.keys()
 
         if id in keys:
             
             if self.inventory[id] != []:
-                print("This item costs: " + self.inventory[id[2]])
+                print("This item costs: " + str(self.inventory[id][2]))
                 self.request_currency(id)
-                print("Here is your " + self.inventory[id[0]])
-                self.inventory[id[1]] = self.inventory[id[1]] - 1
+                print("Here is your " + self.inventory[id][0])
+                self.inventory[id][1] = self.inventory[id][1] - 1
                 return True
             
             else:
@@ -47,7 +44,14 @@ class VendingMachine():
         
 
     def request_currency(self, id):
-        '''Will continually request money until the price is met. Will return change if there is any
+        '''
+        request_currency(id) --> void
+        Will continually request money until the price is met. Will return change if there is any
+
+        >>> ven = VendingMachine()
+        >>> ven.inventory["A0"] = ["Lay's Potato Chips", 28, 4.00]
+        >>> ven.purchase_item("A0")
+        True
         '''
         money = int(input("Please pay here: "))
 
@@ -66,11 +70,11 @@ class VendingMachine():
         # Handle dynamic title width
         string_max = 0
         for item in self.inventory.values():
-            local_max = if x := list(map(len, item)).empty()
+            local_max = 0 # if x := list(map(len, item)).empty()
             if local_max > string_max:
                 string_max = local_max
 
-        print("=" * (max // 2))
+        print("=" * (string_max // 2))
         for item in self.inventory:
             print(self.inventory[item])
 
@@ -84,8 +88,6 @@ print(myVen.inventory)
 def _test():
     import doctest
     doctest.testmod()
-
-    {A0: }
 
 
 if __name__ == "__main__":
