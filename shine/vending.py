@@ -13,7 +13,23 @@ class VendingMachine():
     def prompt(self):
         pass
 
-    def purchase_item(self):
+    def purchase_item(self, id):
+        '''purchase_item(id) --> bool;
+        When passed an id, purchase_item will check if there are items in that id to purchase
+        '''
+        keys = self.inventory.keys()
+
+        if id in keys:
+            
+            if id != []:
+                print("This item costs: " + id[2])
+                money = input("Please pay here: ")
+                if money == id[2]:
+
+        else:
+            print("Invalid Choice")
+            return False
+        
         pass
 
     def view_inventory(self):
