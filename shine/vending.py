@@ -62,15 +62,11 @@ class VendingMachine():
             money = money - self.inventory[id[2]]
             print("Here is your change of: $" + money)
 
-
-                
-        
-
     def view_inventory(self):
         # Handle dynamic title width
         string_max = 0
         for item in self.inventory.values():
-            local_max = 0 # if x := list(map(len, item)).empty()
+            local_max = max(x) if (x := list(map(len, item))) else 0
             if local_max > string_max:
                 string_max = local_max
 
