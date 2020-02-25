@@ -28,11 +28,16 @@ class VendingMachine():
         if id in keys:
             
             if self.inventory[id] != []:
-                print("This item costs: " + str(self.inventory[id][2]))
-                self.request_currency(id)
-                print("Here is your " + self.inventory[id][0])
-                self.inventory[id][1] = self.inventory[id][1] - 1
-                return True
+                if self.inventory[id][1] != 0:
+                    print("This item costs: " + str(self.inventory[id][2]))
+                    self.request_currency(id)
+                    print("Here is your " + self.inventory[id][0])
+                    self.inventory[id][1] = self.inventory[id][1] - 1
+                    return True
+                else:
+                    print("No longer in stock")
+                    return False
+
             
             else:
                 print("No longer in stock")
@@ -50,16 +55,19 @@ class VendingMachine():
 
         >>> ven = VendingMachine()
         >>> ven.inventory["A0"] = ["Lay's Potato Chips", 28, 4.00]
+        >>> ven.inventory["A1"] = ["Lay's Potato Chips", 0, 4.00]
         >>> ven.purchase_item("A0")
         True
+        >>> ven.purchase_item('A1")
+        False
         '''
         money = int(input("Please pay here: "))
 
-        while money < self.inventory[id[2]]:
+        while money < self.inventory[id][2]:
             money = money + int(input("Please add more money: "))
         
-        if money > self.inventory[id[2]]:
-            money = money - self.inventory[id[2]]
+        if money > self.inventory[id][2]:
+            money = money - self.inventory[id][2]
             print("Here is your change of: $" + money)
 
 
