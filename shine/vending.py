@@ -70,10 +70,11 @@ class VendingMachine():
         
         if money > self.inventory[id][2]:
             money = money - self.inventory[id][2]
-            print("Here is your change of: $" + money)
+            print("Here is your change of: $%.2f" % money)
 
 
-                
+    def add_item(self):
+        pass            
         
 
     def view_inventory(self):
