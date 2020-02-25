@@ -10,4 +10,10 @@ class VendingMachine():
     def __init__(self):
         pass
 
+    def purchase_item(self):
+        pass
+
+    def view_inventory(self):
+        pass
+
 
