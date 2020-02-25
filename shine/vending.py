@@ -60,6 +60,8 @@ class VendingMachine():
         True
         >>> ven.purchase_item('A1")
         False
+        >>> ven.purchse_item("Z2")
+        False
         '''
         money = int(input("Please pay here: "))
 
