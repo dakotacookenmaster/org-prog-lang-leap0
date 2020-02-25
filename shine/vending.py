@@ -21,21 +21,45 @@ class VendingMachine():
     def purchase_item(self, id):
         '''purchase_item(id) --> bool;
         When passed an id, purchase_item will check if there are items in that id to purchase
+
+        >>> purchase_item('A0')
+
         '''
         keys = self.inventory.keys()
 
         if id in keys:
             
-            if id != []:
-                print("This item costs: " + id[2])
-                money = input("Please pay here: ")
-                if money == id[2]:
+            if self.inventory[id] != []:
+                print("This item costs: " + self.inventory[id[2]])
+                self.request_currency(id)
+                print("Here is your " + self.inventory[id[0]])
+                self.inventory[id[1]] = self.inventory[id[1]] - 1
+                return True
+            
+            else:
+                print("No longer in stock")
+                return False
 
         else:
             print("Invalid Choice")
             return False
         
-        pass
+
+    def request_currency(self, id):
+        '''Will continually request money until the price is met. Will return change if there is any
+        '''
+        money = int(input("Please pay here: "))
+
+        while money < self.inventory[id[2]]:
+            money = money + int(input("Please add more money: "))
+        
+        if money > self.inventory[id[2]]:
+            money = money - self.inventory[id[2]]
+            print("Here is your change of: $" + money)
+
+
+                
+        
 
     def view_inventory(self):
         pass
@@ -43,6 +67,18 @@ class VendingMachine():
     def prompt(self):
         pass
 
+
 myVen = VendingMachine() 
 print(myVen.inventory)
+
+def _test():
+    import doctest
+    doctest.testmod()
+
+    {A0: }
+
+
+if __name__ == "__main__":
+    _test()
+
 # {id: [name, quantity, price]}
