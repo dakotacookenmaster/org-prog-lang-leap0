@@ -8,10 +8,15 @@
 
 class VendingMachine():
     def __init__(self):
-        pass
-
-    def prompt(self):
-        pass
+        self.inventory = {}
+        self.row_size = 10
+        self.col_size = 10
+        
+        # initialize the inventory to the sizes above
+        for row in range(self.row_size):
+            first_letter = chr(65 + row)
+            for col in range(self.col_size):
+                self.inventory[first_letter + str(col)] = []
 
     def purchase_item(self, id):
         '''purchase_item(id) --> bool;
@@ -35,5 +40,9 @@ class VendingMachine():
     def view_inventory(self):
         pass
 
+    def prompt(self):
+        pass
 
+myVen = VendingMachine() 
+print(myVen.inventory)
 # {id: [name, quantity, price]}
