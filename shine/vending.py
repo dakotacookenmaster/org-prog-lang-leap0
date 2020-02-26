@@ -8,12 +8,12 @@
 
 class VendingMachine():
     def __init__(self):
-        ''' Constructs a VendingMachine object and initializes the inventory to a default 10 x 10. '''
+        ''' Constructs a VendingMachine object and initializes the inventory to a default 5 x 5. '''
         self.inventory = {}
         self.row_size = 5
         self.col_size = 5
         self.admin = False
-        self.admin_password = "admin"
+        self.admin_password = hash("admin")
         self.commands = {
             "INVENTORY": self.view_inventory,
             "PURCHASE": self.purchase_item,
@@ -21,15 +21,17 @@ class VendingMachine():
             "HELP": self.sys_help,
             "EXIT": self.sys_exit,
             "ADMIN": self.authenticate,
-            "BOOST": self.add_to_inventory,
+            "BOOST": self.increase_quantity,
             "PRICE": self.modify_price,
+            "PASSWORD": self.change_password,
+            "LOGOUT": self.logout,
         }
         
         # initialize the inventory to the sizes above
         for row in range(self.row_size):
             first_letter = chr(65 + row)
             for col in range(self.col_size):
-                self.inventory[first_letter + str(col)] = []
+                self.inventory[first_letter + str(col)] = ["Ø (Empty)", "0", "0"]
 
     def sys_help(self, arg_list):
         print()
@@ -40,17 +42,77 @@ class VendingMachine():
         print()
         print("Admin-only commands:")
         print("'add' SLOT_NUMBER NAME QUANTITY PRICE --> adds a new item to the vending machine's inventory. " \
-              "If you need spaces in the name of the product, replace them with underscores (i.e. '_') instead.")
+              "If you need spaces in the name of the product, replace them with underscores (i.e. '_') instead. " \
+              "QUANTITY should be an integer value, and price should be a number with two decimal points (American Currency)")
         print("'exit' --> initiates the vending machine shutdown.")
         print("'boost' SLOT_NUMBER QUANTITY --> increases the current quantity of the given SLOT_NUMBER by the given QUANTITY.")
-        print("'price' SLOT_NUMBER PRICE --> changes the current price of the given SLOT_NUMBER to the given PRICE")
-        print("'admin' PASSWORD --> promotes the current user to admin if the PASSWORD is authenticated.")
+        print("'price' SLOT_NUMBER PRICE --> changes the current price of the given SLOT_NUMBER to the given PRICE.")
+        print("'password' PASSWORD --> changes the current admin password to PASSWORD.")
+        print("'logout' --> demotes the current admin to user status.")
+        print("'admin' PASSWORD --> promotes the current user to admin status if the PASSWORD is authenticated.")
         print()
+
+    def check_arg_count(self, number, arg_list):
+        '''
+        check_arg_count(number, arg_list) --> bool
+        Checks whether the current argument count is equal to number. If it is, return True. Otherwise, return False.
+
+        >>> VEND = VendingMachine()
+        >>> args = ['arg1', 'arg2', 'arg3']
+        >>> args2 = [1, 2, 3, 4, 5, 6, 7]
+        >>> vend.check_arg_count(3, args)
+        True
+        >>> vend.check_arg_count(2, args)
+        False
+        >>> vend.check_arg_count(7, args2)
+        True
+        >>> vend.check_arg_count(15, args2)
+        False
+        '''
+        if len(arg_list) > number:
+            print("Too many arguments passed to command. Type 'help' to learn what arguments are expected for each command.")
+            return False
+        elif len(arg_list) < number:
+            print("Too few arguments passed to command. Type 'help' to learn what arguments are expected for each command.")
+            return False
+        return True
+
+    def logout(self, arg_list):
+        '''
+        Logs the current user out if they're logged in and returns True. Otherwise, returns False.
+        '''
+        if self.admin:
+            self.admin = False
+            print("You have been logged out successfully.")
+            return True
+        else:
+            print("You are not logged in. Type 'admin' followed by your password to get started.")
+            return False
+        
+    def change_password(self, arg_list):
+        '''
+        change_password(NEW_PASSWORD) --> bool \n
+        Change the admin password to NEW_PASSWORD. Returns True upon successful change, False otherwise.
+        '''
+        if self.admin:
+            if not self.check_arg_count(1, arg_list):
+                return False
+
+            try:
+                self.admin_password = hash(arg_list[0])
+                print(f"Password change was successful! Password hash: {self.admin_password}")
+                return True
+
+            except Exception:
+                print("Unable to change the admin password. Please try again.")
+                return False
+        else:
+            self.auth_required()
+            return False
 
     def modify_price(self, arg_list):
         if self.admin:
-            if len(arg_list) != 2:
-                print("Please type 'price' followed by the SLOT_NUMBER and the PRICE you wish to change it to.")
+            if not self.check_arg_count(2, arg_list):
                 return False
 
             slot_number = arg_list[0].upper()
@@ -66,26 +128,32 @@ class VendingMachine():
 
             except Exception:
                 print("Unable to modify price. Check to make sure your command was structured correctly.")
+                return False
         else:
             self.auth_required()
+            return False
 
-    def add_to_inventory(self, arg_list):
-
+    def increase_quantity(self, arg_list):
         if self.admin:
-            if len(arg_list) != 2:
-                print("Please type 'boost' followed by the SLOT_NUMBER and the QUANTITY you wish to boost it by.")
+            if not self.check_arg_count(2, arg_list):
                 return False
             
             slot_number = arg_list[0].upper()
             quantity = int(arg_list[1])
+
+            if self.inventory[slot_number][1] == "0":
+                print("You must add an item to the inventory before you can boost it. Type 'help' to learn more.")
+                return False
 
             try:
                 self.inventory[slot_number][1] = str(int(self.inventory[slot_number][1]) + quantity)
                 return True
             except Exception:
                 print("Unable to boost inventory. Check to make sure your command was structured correctly.")
+                return False
         else:
             self.auth_required()
+            return False
         
     def authenticate(self, arg_list):
         """
@@ -93,11 +161,10 @@ class VendingMachine():
         Returns True if authentication was successful, else returns False
         Changes the user mode from user to admin.
         """
-        if len(arg_list) != 1:
-            print("Please enter the keyword 'admin' followed by your password.")
+        if not self.check_arg_count(1, arg_list):
             return False
 
-        pw = arg_list[0]
+        pw = hash(arg_list[0])
 
         if pw == self.admin_password:
             self.admin = True
@@ -129,24 +196,20 @@ class VendingMachine():
         When passed an item_id, purchase_item will check if there are items in that item_id to purchase
         '''
         keys = self.inventory.keys()
-        if len(arg_list) != 1:
-            print("Please type 'purchase' without the quotes followed by the SLOT_NUMBER you would like to purchase (e.g. purchase A0).")
+        if not self.check_arg_count(1, arg_list):
             return False
         
         item_id = arg_list[0].upper()
 
         if item_id in keys:
-            if self.inventory[item_id] != []:
-                if int(self.inventory[item_id][1]) != 0:
-                    print("This item costs: " + str(self.inventory[item_id][2]))
-                    self.request_currency(item_id)
-                    print(f"Now vending: {self.inventory[item_id][0]}.")
-                    self.inventory[item_id][1] = str(int(self.inventory[item_id][1]) - 1)
-                    return True
-                else:
-                    print("That slot is out of stock. Please try again.")
-                    return False
-
+            if int(self.inventory[item_id][1]) != 0:
+                print("This item costs: $%.2f" % float(self.inventory[item_id][2]))
+                self.request_currency(item_id)
+                print(f"Now vending: {self.inventory[item_id][0]}.")
+                self.inventory[item_id][1] = str(int(self.inventory[item_id][1]) - 1)
+                if self.inventory[item_id][1] == "0":
+                    self.inventory[item_id] = ["Ø (Empty)", "0", "0"]
+                return True
             else:
                 print("That slot is out of stock. Please try again.")
                 return False
@@ -162,7 +225,7 @@ class VendingMachine():
 
         >>> ven = VendingMachine()
         >>> ven.inventory["A0"] = [Lay's_Potato_Chips, 28, 4.00]
-        >>> ven.inventory["A1"] = [Lay's_Potato_Chips", 0, 4.00]
+        >>> ven.inventory["A1"] = [Lay's_Potato_Chips, 0, 4.00]
         >>> ven.purchase_item("A0")
         True
         >>> ven.purchase_item("A1")
@@ -171,12 +234,12 @@ class VendingMachine():
         False
         '''
         price = float(self.inventory[item_id][2])
-        money = float(input("Please pay here: "))
+        money = 0
 
-        while money < float(price):
+        while money < price:
             remaining = price - money
             try:
-                money = money + float(input("Please add more money (%.2f remaining): " % remaining))
+                money = money + float(input("Please insert currency ($%.2f remaining): " % remaining))
             except Exception:
                 print("Please enter a valid monetary amount.")
      
@@ -193,20 +256,24 @@ class VendingMachine():
         (or replaced), otherwise False. 
         '''
         if self.admin:
-            if len(arg_list) != 4:
-                print("Please specify the appropriate SLOT_NUMBER, NAME, QUANTITY, and PRICE in order to add an item.")
+            if not self.check_arg_count(4, arg_list):
                 return False
 
-            slot_number = arg_list[0].upper()
-            name = " ".join(list(map(str.capitalize, arg_list[1].replace("_", " ").split())))
-            quantity = arg_list[2]
-            price = arg_list[3]
+            try:
+                slot_number = arg_list[0].upper()
+                name = " ".join(list(map(str.capitalize, arg_list[1].replace("_", " ").split())))
+                quantity = str(int(float(arg_list[2])))
+                price = "%.2f" % float(arg_list[3])
+            except Exception as e:
+                print("Unable to add item to inventory. Type 'help' to review command syntax.")
+                print(e)
+                return False
 
             if slot_number not in self.inventory:
                 print(f"The SLOT_NUMBER '{slot_number}' is invalid. Operation cancelled.")
                 return False
-            
-            if (not self.inventory[slot_number]) or (self.inventory[slot_number][1] == 0):
+
+            if ((self.inventory[slot_number][0] == "Ø (Empty)") and (self.inventory[slot_number][1] == "0")):
                 try:
                     self.inventory[slot_number] = [name, quantity, price]
                     print(f"Successfully added {name} to the inventory.")
@@ -232,7 +299,8 @@ class VendingMachine():
 
     def view_inventory(self, arg_list):
         '''
-        view_inventory(arg_list)
+        view_inventory(arg_list) --> void \n
+        Prints the current inventory.
         '''
         # Handle dynamic inventory sizing
         string_max = 0
@@ -252,9 +320,13 @@ class VendingMachine():
         print("PRICE".center(string_max, " "))
 
         for lst in self.inventory:
+            items = self.inventory[lst]
+            quantity = "%d" % int(items[1])
+            price = "$%.2f" % float(items[2])
             print(str(lst).center(string_max, " "), end="")
-            for item in self.inventory[lst]:
-                print(str(item).center(string_max, " "), end="")
+            print(items[0].center(string_max, " "), end="")
+            print(quantity.center(string_max, " "), end="")
+            print(price.center(string_max, " "), end="")
             print()
 
     def prompt(self):
