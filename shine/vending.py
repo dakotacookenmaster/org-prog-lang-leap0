@@ -4,7 +4,7 @@
 # Programmed by:
 #   Dakota Cookenmaster
 #   Michael Yoon
-# Last edit: 02/25/2020
+# Last edit: 02/26/2020
 
 class VendingMachine():
     def __init__(self):
@@ -56,24 +56,12 @@ class VendingMachine():
         '''
         check_arg_count(number, arg_list) --> bool
         Checks whether the current argument count is equal to number. If it is, return True. Otherwise, return False.
-
-        >>> VEND = VendingMachine()
-        >>> args = ['arg1', 'arg2', 'arg3']
-        >>> args2 = [1, 2, 3, 4, 5, 6, 7]
-        >>> vend.check_arg_count(3, args)
-        True
-        >>> vend.check_arg_count(2, args)
-        False
-        >>> vend.check_arg_count(7, args2)
-        True
-        >>> vend.check_arg_count(15, args2)
-        False
         '''
         if len(arg_list) > number:
-            print("Too many arguments passed to command. Type 'help' to learn what arguments are expected for each command.")
+            print(f"Too many arguments passed to command (expected {number}). Type 'help' to learn what arguments are expected for each command.")
             return False
         elif len(arg_list) < number:
-            print("Too few arguments passed to command. Type 'help' to learn what arguments are expected for each command.")
+            print(f"Too few arguments passed to command (expected {number}). Type 'help' to learn what arguments are expected for each command.")
             return False
         return True
 
@@ -139,7 +127,7 @@ class VendingMachine():
                 return False
             
             slot_number = arg_list[0].upper()
-            quantity = int(arg_list[1])
+            quantity = int(float(arg_list[1]))
 
             if self.inventory[slot_number][1] == "0":
                 print("You must add an item to the inventory before you can boost it. Type 'help' to learn more.")
@@ -222,16 +210,6 @@ class VendingMachine():
         '''
         request_currency(item_id) --> void
         Will continually request money until the price is met. Will return change if there is any.
-
-        >>> ven = VendingMachine()
-        >>> ven.inventory["A0"] = [Lay's_Potato_Chips, 28, 4.00]
-        >>> ven.inventory["A1"] = [Lay's_Potato_Chips, 0, 4.00]
-        >>> ven.purchase_item("A0")
-        True
-        >>> ven.purchase_item("A1")
-        False
-        >>> ven.purchase_item("Z2")
-        False
         '''
         price = float(self.inventory[item_id][2])
         money = 0
@@ -261,7 +239,7 @@ class VendingMachine():
 
             try:
                 slot_number = arg_list[0].upper()
-                name = " ".join(list(map(str.capitalize, arg_list[1].replace("_", " ").split())))
+                name = " ".join(list(map(str.capitalize, arg_list[1].split("_"))))
                 quantity = str(int(float(arg_list[2])))
                 price = "%.2f" % float(arg_list[3])
             except Exception as e:
@@ -346,7 +324,3 @@ MY_VEN = VendingMachine()
 
 while True:
     MY_VEN.prompt()
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
