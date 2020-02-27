@@ -413,20 +413,21 @@ if debug:
     assert test, f"increase_quantity() failed"
 
     vm.admin = False
-    vm.add_item(["A5", "bag'o_chips", "5", "5.00"])
-    test = vm.increase_quantity(["A5", "9000"])
+    vm.add_item(["A4", "bag'o_chips", "5", "5.00"])
+    test = vm.increase_quantity(["A4", "9000"])
     assert not test, f"increase_quantity() failed"
 
     vm.admin = True
-    vm.add_item(["A6", "bag'o_chips", "5", "5.00"])
+    vm.add_item(["A3", "bag'o_chips", "5", "5.00"])
     test = vm.increase_quantity(["A1", "9000"])
     assert not test, f"increase_quantity() failed"
 
-
-
-
+    #authenticate()
+    test = vm.authenticate("admin")
+    assert test, f"authenticate() failed"
     
-
+    test = vm.authenticate("Password")
+    assert not test, f"authenticate() failed"
 
 MY_VEN = VendingMachine()
 
