@@ -7,6 +7,7 @@
 # Last edit: 02/26/2020
 # Note: The random library is included in the Python Standard Library (https://docs.python.org/3.3/library/random.html)
 import random
+import os
 
 class Maze:
     """ Top-level parent for Maze variants. """
@@ -37,6 +38,12 @@ class Fork(Maze):
     def move_forward(self):
         print("Unable to move forward. There is only a path to the left and right.")
         return self
+
+    def move_left(self):
+        return self.left
+
+    def move_right(self):
+        return self.right
 
     def __str__(self):
         return "Fork"
@@ -128,14 +135,15 @@ class GameObject:
 
     recursion_limit = 10
 
-    files = ['fork.txt']
+    files = ["fork.txt"]
 
     for f in files:
         try:
-            with open(f"room_descriptions/{f}") as fork:
-                fork = filter(None, fork.readlines())
+            with open(f"./amaze/room_descriptions/{f}", "r") as f_desc:
+                fork = [(i).replace("\n", "") for i in f_desc.readlines() if (i != '' and i != '\n')]
         except Exception:
             print(f"Unable to open {f}. Was it removed?")
+            exit(0)
 
     def __init__(self):
         self.maze = Fork(left = GameObject.build_maze(), 
@@ -145,7 +153,9 @@ class GameObject:
 
         self.commands = {
             "LOOK": self.elaborate,
-            "FORWARD": self.move_forward
+            "FORWARD": self.move_forward,
+            "LEFT": self.move_left,
+            "RIGHT": self.move_right,
         }
 
 
@@ -185,6 +195,6 @@ class GameObject:
 
 # Define the global GameObject
 mazeGame = GameObject()
-print(repr(mazeGame.maze))
-# while True:
-#     mazeGame.prompt()
+# print(repr(mazeGame.maze))
+while True:
+    mazeGame.prompt()
