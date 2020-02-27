@@ -138,10 +138,10 @@ class VendingMachine():
 
     def increase_quantity(self, arg_list):
         '''
-        increase_quantity([SLOT_NUMBER, NAME, QUANTITY, PRICE]) --> bool \n
+        increase_quantity([SLOT_NUMBER, QUANTITY]) --> bool \n
         Allows the admin to increase the amount of an exsisting item \n
         if the item is present and the request is formated correctly, returns True \n
-        otherwise, the function will prompt the user and return false \n
+        otherwise, the function will prompt the user and return false
         '''
         if self.admin:
             if not self.check_arg_count(2, arg_list):
@@ -385,6 +385,38 @@ if debug:
     vm.admin = False
     test = vm.change_password(["NEW_PASSWORD!"])
     assert not test, f"change_password() failed"
+
+    #modify_price()
+    vm.admin = True
+    test = vm.modify_price(["A0", 5.00])
+    assert test, f"modify_price() failed"
+
+    vm.admin = True
+    test = vm.modify_price(["Hello", 5.00])
+    assert not test, f"modify_price() failed"
+
+    vm.admin = False
+    test = vm.modify_price(["A9", 300])
+    assert not test, f"modify_price() failed"
+
+    #increase_quantity()
+    vm.admin = True
+    vm.add_item(["A0", "bag'o_chips", "5", "5.00"])
+    test = vm.increase_quantity(["A0", "9000"])
+    assert test, f"increase_quantity() failed"
+
+    vm.admin = False
+    vm.add_item(["A5", "bag'o_chips", "5", "5.00"])
+    test = vm.increase_quantity(["A5", "9000"])
+    assert not test, f"increase_quantity() failed"
+
+    vm.admin = True
+    vm.add_item(["A6", "bag'o_chips", "5", "5.00"])
+    test = vm.increase_quantity(["A1", "9000"])
+    assert not test, f"increase_quantity() failed"
+
+
+
 
     
 
