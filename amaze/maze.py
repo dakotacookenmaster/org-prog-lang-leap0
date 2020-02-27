@@ -18,14 +18,21 @@ class Maze:
 
 class Fork(Maze):
     def __init__(self, **kwargs):
-        self.description = str(self)
-        self.left = kwargs['left'](left = GameObject.build_maze(), 
-                                   right = GameObject.build_maze(), 
-                                   forward = GameObject.build_maze())
+        self.description = random.choice(GameObject.fork)
+        self.depth = kwargs['depth']
+        if self.depth < GameObject.recursion_limit:
+            self.left = kwargs['left'](left = GameObject.build_maze(), 
+                                    right = GameObject.build_maze(), 
+                                    forward = GameObject.build_maze(),
+                                    depth = self.depth + 1)
 
-        self.right = kwargs['right'](left = GameObject.build_maze(), 
-                                     right = GameObject.build_maze(), 
-                                     forward = GameObject.build_maze())
+            self.right = kwargs['right'](left = GameObject.build_maze(), 
+                                        right = GameObject.build_maze(), 
+                                        forward = GameObject.build_maze(),
+                                        depth = self.depth + 1)
+        else:
+            self.left = GameObject.get_endpoint()()
+            self.right = GameObject.get_endpoint()()
 
     def move_forward(self):
         print("Unable to move forward. There is only a path to the left and right.")
@@ -54,9 +61,14 @@ class DeadEnd(Maze):
 class Room(Maze):
     def __init__(self, **kwargs):
         self.description = str(self)
-        self.forward = kwargs['forward'](left = GameObject.build_maze(), 
-                                         right = GameObject.build_maze(), 
-                                         forward = GameObject.build_maze())
+        self.depth = kwargs['depth']
+        if self.depth < GameObject.recursion_limit:
+            self.forward = kwargs['forward'](left = GameObject.build_maze(), 
+                                            right = GameObject.build_maze(), 
+                                            forward = GameObject.build_maze(),
+                                            depth = self.depth + 1)
+        else:
+            self.forward = GameObject.get_endpoint()()
     
     def move_forward(self):
         return self.forward
@@ -70,12 +82,17 @@ class Room(Maze):
 class Enemy(Maze):
     def __init__(self, **kwargs):
         self.description = str(self)
-        self.forward = kwargs['forward'](left = GameObject.build_maze(), 
-                                         right = GameObject.build_maze(), 
-                                         forward = GameObject.build_maze())
+        self.depth = kwargs['depth']
+        if self.depth < GameObject.recursion_limit:
+            self.forward = kwargs['forward'](left = GameObject.build_maze(), 
+                                            right = GameObject.build_maze(), 
+                                            forward = GameObject.build_maze(),
+                                            depth = self.depth + 1)
+        else:
+            self.forward = GameObject.get_endpoint()()
 
     def move_forward(self):
-        print("Normall, you'd have to kill an enemy here.")
+        print("Normally, you'd have to kill an enemy here.")
         return self.forward
 
     def __str__(self):
@@ -100,15 +117,37 @@ class Exit(Maze):
         return f"Exit()"
 
 class GameObject:
+    # Static attributes
+    maze_variants = [
+        Fork, Fork, Fork, Fork, Fork, Fork,
+        Room, Room, Room, Room, Room,
+        Enemy, Enemy,
+        DeadEnd,
+        Exit
+    ]
+
+    recursion_limit = 10
+
+    files = ['fork.txt']
+
+    for f in files:
+        try:
+            with open(f"room_descriptions/{f}") as fork:
+                fork = filter(None, fork.readlines())
+        except Exception:
+            print(f"Unable to open {f}. Was it removed?")
+
     def __init__(self):
-        self.maze = Room(left = GameObject.build_maze(), 
+        self.maze = Fork(left = GameObject.build_maze(), 
                          right = GameObject.build_maze(),
-                         forward = GameObject.build_maze())
+                         forward = GameObject.build_maze(),
+                         depth = 0)
 
         self.commands = {
             "LOOK": self.elaborate,
             "FORWARD": self.move_forward
         }
+
 
     # Define commands here instead of linking directly to Maze class to allow custom handling
     # of the results.
@@ -118,26 +157,34 @@ class GameObject:
     def move_forward(self):
         self.maze = self.maze.move_forward()
 
+    def move_left(self):
+        self.maze = self.maze.move_left()
+
+    def move_right(self):
+        self.maze = self.maze.move_left()
+
     def prompt(self):
         user_input = input("> ").upper()
         if user_input in self.commands:
             self.commands[user_input]()
         else:
             print("You've entered an invalid command. Type 'help' to see what commands are available.")
-    
+
+    @staticmethod
+    def set_recursion_limit(new_limit):
+        GameObject.recursion_limit = new_limit
+
+    @staticmethod
+    def get_endpoint():
+        return random.choice([DeadEnd, Exit])
+
     @staticmethod
     def build_maze():
-        maze_variants = [
-            Room, Room,
-            Fork, Fork,
-            DeadEnd,
-            Enemy,
-            Exit
-        ]
-        return random.choice(maze_variants)
+        return random.choice(GameObject.maze_variants)
+
 
 # Define the global GameObject
 mazeGame = GameObject()
-
-while True:
-    mazeGame.prompt()
+print(repr(mazeGame.maze))
+# while True:
+#     mazeGame.prompt()
