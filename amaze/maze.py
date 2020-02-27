@@ -25,6 +25,20 @@ class Maze:
         '''
         print(f"{self.description}")
 
+    def __str__(self):
+        '''
+        str(Maze) --> String \n
+        Returns a string reprentation of the object.
+        '''
+        return "Maze"
+
+    def __repr__(self):
+        '''
+        repr(Maze) --> String \n
+        Returns a string representing the object's definition.
+        '''
+        return "Maze()"
+
 class Fork(Maze):
     """ Fork variant of the Maze class. Spawns a left and right Maze """
     def __init__(self, **kwargs):
@@ -47,7 +61,7 @@ class Fork(Maze):
     def move_forward(self):
         '''
         move_forward() --> Maze \n
-        Moves the player forward. If unable, will display a message. \n
+        Moves the player forward. If unable, will display a message.
         '''
         print("Unable to move forward. There is only a path to the left and right.")
         return self
@@ -55,7 +69,7 @@ class Fork(Maze):
     def fight(self):
         '''
         fight() --> void \n
-        Starts a fight. \n
+        Starts a fight.
         '''
         print("Only the spork people fight at forks.")
 
@@ -74,9 +88,17 @@ class Fork(Maze):
         return self.right
 
     def __str__(self):
+        '''
+        str(Fork) --> String \n
+        Returns a string reprentation of the object.
+        '''
         return "Fork"
 
     def __repr__(self):
+        '''
+        repr(Fork) --> String \n
+        Returns a string representing the object's definition.
+        '''
         return f"Fork({repr(self.left)}, {repr(self.right)})"
 
 class DeadEnd(Maze):
@@ -114,9 +136,17 @@ class DeadEnd(Maze):
         exit(0)
 
     def __str__(self):
+        '''
+        str(DeadEnd) --> String \n
+        Returns a string reprentation of the object.
+        '''
         return "DeadEnd"
 
     def __repr__(self):
+        '''
+        repr(DeadEnd) --> String \n
+        Returns a string representing the object's definition.
+        '''
         return f"DeadEnd()"
 
 class Room(Maze):
@@ -148,7 +178,7 @@ class Room(Maze):
 
     def move_left(self):
         '''
-        move_left() --> Maze
+        move_left() --> Maze \n
         Points to move_forward().
         '''
         print("You are unable to move to the left. A wall blocks your path.")
@@ -163,9 +193,17 @@ class Room(Maze):
         return self
 
     def __str__(self):
+        '''
+        str(Room) --> String \n
+        Returns a string reprentation of the object.
+        '''
         return "Room"
 
     def __repr__(self):
+        '''
+        repr(Room) --> String \n
+        Returns a string representing the object's definition.
+        '''
         return f"Room({repr(self.forward)})"
 
 class Enemy(Maze):
@@ -185,23 +223,23 @@ class Enemy(Maze):
     def move_forward(self):
         '''
         move_forward() --> Maze \n
-        If the enemy is dead, moves the player forward. 
+        If the enemy is dead, moves the player forward. \n
         If not, displays a message.
         '''
         if self.enemy_dead:
             return self.forward
         else:
-            print("The danger is still in your path! You might fight to move forward!")
+            print("The danger is still in your path! You must fight to move forward!")
             return self
 
     def fight(self):
         '''
         fight() --> void \n
-        Starts a fight with the enemy.
-        If successful, lets player move forward.
+        Starts a fight with the enemy. \n
+        If successful, lets player move forward. \n
         If unsuccessful, exits.
         '''
-        fate = random.choice([True, True, True, True, True, False])
+        fate = random.choice([True, True, True, True, False, False])
         if fate:
             print("By some stroke of luck, you are still alive! The enemy has been defeated, and you can move onwards.")
             self.description = "The danger has passed. You may now move forward."
@@ -227,9 +265,17 @@ class Enemy(Maze):
         return self
 
     def __str__(self):
+        '''
+        str(Enemy) --> String \n
+        Returns a string reprentation of the object.
+        '''
         return "Enemy"
 
     def __repr__(self):
+        '''
+        repr(Enemy) --> String \n
+        Returns a string representing the object's definition.
+        '''
         return f"Enemy({repr(self.forward)})"
 
 
@@ -268,9 +314,17 @@ class Exit(Maze):
         print("There is nothing to fight here...except yourself. You give yourself a good face whacking and move on.")
     
     def __str__(self):
+        '''
+        str(Exit) --> String \n
+        Returns a string reprentation of the object.
+        '''
         return "Exit"
 
     def __repr__(self):
+        '''
+        repr(Exit) --> String \n
+        Returns a string representing the object's definition.
+        '''
         return f"Exit()"
 
 class GameObject:
@@ -371,8 +425,8 @@ class GameObject:
     def prompt(self):
         '''
         prompt() --> void \n
-        Takes input from the user and matches to the current command list.
-        If the Command is vaild, it executes.
+        Takes input from the user and matches to the current command list. \n
+        If the Command is vaild, it executes. \n
         Otherwise, it displays an error message.
         '''
         user_input = input("> ").upper()
@@ -418,6 +472,20 @@ class GameObject:
         '''
         return random.choice(GameObject.maze_variants)
 
+    def __str__(self):
+        '''
+        str(GameObject) --> String \n
+        Returns a string reprentation of the object.
+        '''
+        return "GameObject"
+
+    def __repr__(self):
+        '''
+        repr(GameObject) --> String \n
+        Returns a string representing the object's definition.
+        '''
+        return "GameObject()"
+
 
 if debug:
     ##############################################
@@ -455,7 +523,8 @@ if debug:
     assert old_maze is not new_maze, f"move_forward() failed in {myGame}."
 
     # Elaborate
-    assert myGame.elaborate() is not None, f"elaborate() failed in {myGame}."
+    assert myGame.descriptions is not None, f"Descriptions are undefined in {myGame}."
+    assert myGame.maze.description is not None,  f"Maze description is undefined in {myGame}."
     del myGame
 
     ######################################################
@@ -463,29 +532,43 @@ if debug:
     ######################################################
     myMaze = Maze()
     assert myMaze.description is not None, "Maze description was left uninitialized."
-    assert myMaze.elaborate() == 'Top-level Maze Variant', f"elaborate() failed on {myMaze}."
     del myMaze
 
     ######################################################
     ################# Maze Variant Tests #################
     ######################################################
-    myFork = Fork(left=DeadEnd(), right=DeadEnd(), depth=GameObject.recursion_limit)
-    myRoom = Room(forward=Exit(), depth=GameObject.recursion_limit)
-    myEnemy = Enemy(forward=Exit(), depth=GameObject.recursion_limit)
+    myFork = Fork(depth=GameObject.recursion_limit)
+    myRoom = Room(depth=GameObject.recursion_limit)
+    myEnemy = Enemy(depth=GameObject.recursion_limit)
     myDeadEnd = DeadEnd()
     myExit = Exit()
+    fullMaze = Fork(depth=GameObject.recursion_limit)
+    myRoom.forward = DeadEnd()
+    fullMaze.left = myRoom
+    myEnemy.forward = Exit()
+    fullMaze.right = myEnemy
 
+    assert myFork is not None, f"Fork initialization failed."
     assert myFork is myFork.move_forward(), f"move_forward() erroneously allowed forward movement in {myFork}."
     assert myFork is not myFork.move_right(), f"move_right() failed in {myFork}."
     assert myFork is not myFork.move_left(), f"move_left() failed in {myFork}."
+    assert myFork.description is not None, f"Fork description left uninitialized in {myFork}."
+    assert myRoom is not None, f"Room initialization failed."
     assert myRoom is myRoom.move_left(), f"move_left() erroneously allowed leftward movement in {myRoom}."
     assert myRoom is myRoom.move_right(), f"move_right() erroneously allowed forward movement in {myRoom}."
     assert myRoom is not myRoom.move_forward(), f"move_forward() failed in {myRoom}."
+    assert myRoom.description is not None, f"Room description left uninitialized in {myRoom}."
+    assert myEnemy is not None, f"Enemy initialization failed."
     assert myEnemy is myEnemy.move_left(), f"move_left() erroneously allowed leftward movement in {myEnemy}."
     assert myEnemy is myEnemy.move_right(), f"move_right() erroneously allowed forward movement in {myEnemy}."
     assert myEnemy is myEnemy.move_forward(), f"move_forward() erroneously allowed forward movement without defeating enemy in {myEnemy}."
     myEnemy.enemy_dead = True
     assert myEnemy is not myEnemy.move_forward(), f"move_forward() failed in {myEnemy}."
+    assert myEnemy.description is not None, f"Fork description left uninitialized in {myEnemy}."
+    assert myDeadEnd is not None, f"DeadEnd initialization failed."
+    assert myExit is not None, f"Exit initialization failed."
+    assert str(fullMaze) == "Fork", f"str() failed in {fullMaze}."
+    assert repr(fullMaze) == "Fork(Room(DeadEnd()), Enemy(Exit()))", f"repr() failed in {fullMaze}."
 
 # Define the global GameObject
 mazeGame = GameObject()
