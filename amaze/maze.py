@@ -58,7 +58,7 @@ class Fork(Maze):
 
 class DeadEnd(Maze):
     def __init__(self, **kwargs):
-        self.description = GameObject.descriptions['deadend']
+        self.description = random.choice(GameObject.descriptions['deadend'])
 
     def move_left(self):
         self.move_forward()
@@ -81,7 +81,7 @@ class DeadEnd(Maze):
 
 class Room(Maze):
     def __init__(self, **kwargs):
-        self.description = str(self)
+        self.description = random.choice(GameObject.descriptions['room'])
         self.depth = kwargs['depth']
         if self.depth < GameObject.recursion_limit:
             self.forward = kwargs['forward'](left = GameObject.get_maze(), 
@@ -99,9 +99,11 @@ class Room(Maze):
 
     def move_left(self):
         print("You are unable to move to the left. A wall blocks your path.")
+        return self
 
     def move_right(self):
         print("You are unable to move to the right. A wall blocks your path.")
+        return self
 
     def __str__(self):
         return "Room"
@@ -127,21 +129,25 @@ class Enemy(Maze):
             return self.forward
         else:
             print("The danger is still in your path! You might fight to move forward!")
+            return self
 
     def fight(self):
         fate = random.choice([True, True, True, True, True, False])
         if fate:
             print("By some stroke of luck, you are still alive! The enemy has been defeated, and you can move onwards.")
             self.description = "The danger has passed. You may now move forward."
+            self.enemy_dead = True
         else:
             print("Your journey is now over. Rest in peace.")
             exit(0)
     
     def move_left(self):
         print("You are unable to move to the left. A wall blocks your path.")
+        return self
 
     def move_right(self):
         print("You are unable to move to the right. A wall blocks your path.")
+        return self
 
     def __str__(self):
         return "Enemy"
@@ -158,6 +164,12 @@ class Exit(Maze):
         print("You made it out!")
         exit(0)
 
+    def move_left(self):
+        self.move_forward()
+
+    def move_right(self):
+        self.move_forward()
+
     def fight(self):
         print("There is nothing to fight here...except yourself. You give yourself a good face whacking and move on.")
     
@@ -172,9 +184,7 @@ class GameObject:
     maze_variants = [
         Fork, Fork, Fork, Fork, Fork, Fork,
         Room, Room, Room, Room, Room,
-        Enemy, Enemy,
-        DeadEnd,
-        Exit
+        Enemy, Enemy, Enemy, Enemy
     ]
 
     descriptions = {
@@ -183,8 +193,9 @@ class GameObject:
         'deadend': [],
         'enemy': [],
         'exit': [],
+        'room': [],
     }
-    recursion_limit = 10
+    recursion_limit = 20
 
     for f in descriptions:
         try:
@@ -262,6 +273,6 @@ class GameObject:
 # Define the global GameObject
 mazeGame = GameObject()
 print("Welcome to the maze of mystery! Inside, you may live, die, or escape. The journey is the destination!")
-# print(repr(mazeGame.maze))
-while True:
-    mazeGame.prompt()
+print(repr(mazeGame.maze))
+# while True:
+#     mazeGame.prompt()
