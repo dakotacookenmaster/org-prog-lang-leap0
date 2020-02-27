@@ -11,6 +11,8 @@
 # We simply include this one module from the standard library to make some random choices about which maze section will spawn next.
 import random
 
+debug = True # make True to run tests
+
 class Maze:
     """ Top-level parent for Maze variants. """
     def __init__(self):
@@ -24,6 +26,7 @@ class Maze:
         print(f"{self.description}")
 
 class Fork(Maze):
+    """ Fork variant of the Maze class. Spawns a left and right Maze """
     def __init__(self, **kwargs):
         self.description = random.choice(GameObject.descriptions['fork'])
         self.depth = kwargs['depth']
@@ -77,6 +80,7 @@ class Fork(Maze):
         return f"Fork({repr(self.left)}, {repr(self.right)})"
 
 class DeadEnd(Maze):
+    """ DeadEnd variant of the Maze class. Endpoint which results in a Game Over. """
     def __init__(self, **kwargs):
         self.description = random.choice(GameObject.descriptions['deadend'])
 
@@ -116,6 +120,7 @@ class DeadEnd(Maze):
         return f"DeadEnd()"
 
 class Room(Maze):
+    """ Room variant of the Maze class. Spawns a forward maze. """
     def __init__(self, **kwargs):
         self.description = random.choice(GameObject.descriptions['room'])
         self.depth = kwargs['depth']
@@ -164,6 +169,7 @@ class Room(Maze):
         return f"Room({repr(self.forward)})"
 
 class Enemy(Maze):
+    """ Enemy variant of the Maze class. Spawns a enemy that must be fought, and a forward Maze. """
     def __init__(self, **kwargs):
         self.description = random.choice(GameObject.descriptions['enemy'])
         self.depth = kwargs['depth']
@@ -228,6 +234,7 @@ class Enemy(Maze):
 
 
 class Exit(Maze):
+    """ Exit variant of the Maze class. Endpoint which results in winning the game. """
     def __init__(self, **kwargs):
         self.description = random.choice(GameObject.descriptions['exit'])
 
@@ -267,12 +274,15 @@ class Exit(Maze):
         return f"Exit()"
 
 class GameObject:
+    """ Handles User/IO and the recursive generation of Maze objects. """
     # Static attributes
     maze_variants = [
         Fork, Fork, Fork, Fork, Fork, Fork,
         Room, Room, Room, Room, Room,
         Enemy, Enemy, Enemy, Enemy
     ]
+
+    maze_endpoints = [DeadEnd, Exit]
 
     descriptions = {
         'fork': [],
@@ -398,7 +408,7 @@ class GameObject:
         Returns either a DeadEnd or Exit Maze.
 
         '''
-        return random.choice([DeadEnd, Exit])
+        return random.choice(GameObject.maze_endpoints)
 
     @staticmethod
     def get_maze():
@@ -408,6 +418,74 @@ class GameObject:
         '''
         return random.choice(GameObject.maze_variants)
 
+
+if debug:
+    ##############################################
+    ############## GameObject Tests ##############
+    ##############################################
+
+    # Static Function Tests
+    assert GameObject.get_maze() in GameObject.maze_variants, f"get_maze() failed to produce valid maze variant in {GameObject}."
+    assert GameObject.get_endpoint() in GameObject.maze_endpoints, f"get_endpoint() failed to produce a valid endpoint in {GameObject}." 
+    recursion_limit = GameObject.recursion_limit
+    GameObject.set_recursion_limit(20)
+    assert GameObject.recursion_limit == 20, f"set_recursion_limit() failed in {GameObject}."
+
+    # GameObject Movement Tests
+    # Move Left
+    myGame = GameObject()
+    old_maze = myGame.maze
+    myGame.move_left()
+    new_maze = myGame.maze
+    assert old_maze is not new_maze, f"move_left() failed in {myGame}."
+    del myGame
+
+    # Move Right
+    myGame = GameObject()
+    old_maze = myGame.maze
+    myGame.move_left()
+    new_maze = myGame.maze
+    assert old_maze is not new_maze, f"move_right() failed in {myGame}."
+
+    # Move Forward
+    myGame.maze = Room(forward=DeadEnd(), depth=GameObject.recursion_limit)
+    old_maze = myGame.maze
+    myGame.move_forward()
+    new_maze = myGame.maze
+    assert old_maze is not new_maze, f"move_forward() failed in {myGame}."
+
+    # Elaborate
+    assert myGame.elaborate() is not None, f"elaborate() failed in {myGame}."
+    del myGame
+
+    ######################################################
+    ################# Generic Maze Tests #################
+    ######################################################
+    myMaze = Maze()
+    assert myMaze.description is not None, "Maze description was left uninitialized."
+    assert myMaze.elaborate() == 'Top-level Maze Variant', f"elaborate() failed on {myMaze}."
+    del myMaze
+
+    ######################################################
+    ################# Maze Variant Tests #################
+    ######################################################
+    myFork = Fork(left=DeadEnd(), right=DeadEnd(), depth=GameObject.recursion_limit)
+    myRoom = Room(forward=Exit(), depth=GameObject.recursion_limit)
+    myEnemy = Enemy(forward=Exit(), depth=GameObject.recursion_limit)
+    myDeadEnd = DeadEnd()
+    myExit = Exit()
+
+    assert myFork is myFork.move_forward(), f"move_forward() erroneously allowed forward movement in {myFork}."
+    assert myFork is not myFork.move_right(), f"move_right() failed in {myFork}."
+    assert myFork is not myFork.move_left(), f"move_left() failed in {myFork}."
+    assert myRoom is myRoom.move_left(), f"move_left() erroneously allowed leftward movement in {myRoom}."
+    assert myRoom is myRoom.move_right(), f"move_right() erroneously allowed forward movement in {myRoom}."
+    assert myRoom is not myRoom.move_forward(), f"move_forward() failed in {myRoom}."
+    assert myEnemy is myEnemy.move_left(), f"move_left() erroneously allowed leftward movement in {myEnemy}."
+    assert myEnemy is myEnemy.move_right(), f"move_right() erroneously allowed forward movement in {myEnemy}."
+    assert myEnemy is myEnemy.move_forward(), f"move_forward() erroneously allowed forward movement without defeating enemy in {myEnemy}."
+    myEnemy.enemy_dead = True
+    assert myEnemy is not myEnemy.move_forward(), f"move_forward() failed in {myEnemy}."
 
 # Define the global GameObject
 mazeGame = GameObject()
