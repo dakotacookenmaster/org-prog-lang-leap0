@@ -279,7 +279,6 @@ class GameObject:
         'exit': [],
         'deadend': [],
         'enemy': [],
-        'exit': [],
         'room': [],
     }
     recursion_limit = 20
@@ -325,21 +324,47 @@ class GameObject:
     ###########################################################################################
     
     def fight(self):
+        '''
+        fight() --> void \n
+        Calls corresponding Maze function.
+        '''
         self.maze.fight()
 
     def elaborate(self):
+        '''
+        elaborate() --> void \n
+        Calls corresponding Maze function.
+        '''
         self.maze.elaborate()
 
     def move_forward(self):
+        '''
+        move_forward() --> void \n
+        Reassigns current Maze to the Forward Maze.
+        '''
         self.maze = self.maze.move_forward()
 
     def move_left(self):
+        '''
+        move_left() --> void \n
+        Reassigns current Maze to the Left Maze.
+        '''
         self.maze = self.maze.move_left()
 
     def move_right(self):
+        '''
+        move_right() --> void \n
+        Reassigns current Maze to the Right Maze.
+        '''
         self.maze = self.maze.move_left()
 
     def prompt(self):
+        '''
+        prompt() --> void \n
+        Takes input from the user and matches to the current command list.
+        If the Command is vaild, it executes.
+        Otherwise, it displays an error message.
+        '''
         user_input = input("> ").upper()
         if user_input in self.commands:
             self.commands[user_input]()
@@ -347,6 +372,10 @@ class GameObject:
             print("You've entered an invalid command. Type 'help' to see what commands are available.")
 
     def help(self):
+        '''
+        help() --> void \n
+        Displays information on all the valid commands.
+        '''
         print("'help' --> brings up this help context.")
         print("'look' --> prints information about the room you're currently in.")
         print("'fight' --> engages in hand-to-hand combat with potential assailants.")
@@ -356,14 +385,27 @@ class GameObject:
 
     @staticmethod
     def set_recursion_limit(new_limit):
+        '''
+        set_recursion_limit(new_limit) --> void \n
+        Sets the recursion limit.
+        '''
         GameObject.recursion_limit = new_limit
 
     @staticmethod
     def get_endpoint():
+        '''
+        get_endpoint() --> Maze \n
+        Returns either a DeadEnd or Exit Maze.
+
+        '''
         return random.choice([DeadEnd, Exit])
 
     @staticmethod
     def get_maze():
+        '''
+        get_maze() --> Maze \n
+        Returns one of: Room, Enemy, or Fork Maze.
+        '''
         return random.choice(GameObject.maze_variants)
 
 
