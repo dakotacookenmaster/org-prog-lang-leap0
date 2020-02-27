@@ -17,6 +17,10 @@ class Maze:
         self.description = "Top-level Maze Variant" # this should be replaced by any children of Maze
 
     def elaborate(self):
+        '''
+        elaborate() --> void \n
+        Prints out the description of the current room. \n
+        '''
         print(f"{self.description}")
 
 class Fork(Maze):
@@ -38,16 +42,32 @@ class Fork(Maze):
             self.right = GameObject.get_endpoint()()
 
     def move_forward(self):
+        '''
+        move_forward() --> Maze \n
+        Moves the player forward. If unable, will display a message. \n
+        '''
         print("Unable to move forward. There is only a path to the left and right.")
         return self
 
     def fight(self):
+        '''
+        fight() --> void \n
+        Starts a fight. \n
+        '''
         print("Only the spork people fight at forks.")
 
     def move_left(self):
+        '''
+        move_left --> Maze \n
+        Moves the player left.
+        '''
         return self.left
 
     def move_right(self):
+        '''
+        move_right() --> Maze \n
+        Moves the player right.
+        '''
         return self.right
 
     def __str__(self):
@@ -61,15 +81,31 @@ class DeadEnd(Maze):
         self.description = random.choice(GameObject.descriptions['deadend'])
 
     def move_left(self):
+        '''
+        move_left() --> void \n
+        Points to move_forward().
+        '''
         self.move_forward()
 
     def move_right(self):
+        '''
+        move_right() --> void \n
+        Points to move_forward().
+        '''
         self.move_forward()
 
     def fight(self):
+        '''
+        fight() --> void \n
+        Displays a message.
+        '''
         print("There's nothing to fight here.")
 
     def move_forward(self):
+        '''
+        move_forward() --> void \n
+        Displays message and exits.
+        '''
         print("You've reached a dead-end. Game Over.")
         exit(0)
 
@@ -92,16 +128,32 @@ class Room(Maze):
             self.forward = GameObject.get_endpoint()()
 
     def fight(self):
+        '''
+        fight() --> void \n
+        Displays message.
+        '''
         print("You smack your head against the wall. Things start to spin. You decide it's best to stop.")
     
     def move_forward(self):
+        '''
+        move_forward() --> Maze \n
+        Moves the player forward.
+        '''
         return self.forward
 
     def move_left(self):
+        '''
+        move_left() --> Maze
+        Points to move_forward().
+        '''
         print("You are unable to move to the left. A wall blocks your path.")
         return self
 
     def move_right(self):
+        '''
+        move_right() --> Maze \n
+        Points to move_forward().
+        '''
         print("You are unable to move to the right. A wall blocks your path.")
         return self
 
@@ -125,6 +177,11 @@ class Enemy(Maze):
             self.forward = GameObject.get_endpoint()()
 
     def move_forward(self):
+        '''
+        move_forward() --> Maze \n
+        If the enemy is dead, moves the player forward. 
+        If not, displays a message.
+        '''
         if self.enemy_dead:
             return self.forward
         else:
@@ -132,6 +189,12 @@ class Enemy(Maze):
             return self
 
     def fight(self):
+        '''
+        fight() --> void \n
+        Starts a fight with the enemy.
+        If successful, lets player move forward.
+        If unsuccessful, exits.
+        '''
         fate = random.choice([True, True, True, True, True, False])
         if fate:
             print("By some stroke of luck, you are still alive! The enemy has been defeated, and you can move onwards.")
@@ -142,10 +205,18 @@ class Enemy(Maze):
             exit(0)
     
     def move_left(self):
+        '''
+        move_left() --> Maze \n
+        Displays a message.
+        '''
         print("You are unable to move to the left. A wall blocks your path.")
         return self
 
     def move_right(self):
+        '''
+        move_right() --> Maze \n
+        Displays a message.
+        '''
         print("You are unable to move to the right. A wall blocks your path.")
         return self
 
@@ -161,16 +232,32 @@ class Exit(Maze):
         self.description = random.choice(GameObject.descriptions['exit'])
 
     def move_forward(self):
+        '''
+        move_forward() --> void \n
+        Displays message and exits the maze.
+        '''
         print("You made it out!")
         exit(0)
 
     def move_left(self):
+        '''
+        move_left() --> void \n
+        Points to move_forward().
+        '''
         self.move_forward()
 
     def move_right(self):
+        '''
+        move_right() --> void \n
+        Points to move_forward().
+        '''
         self.move_forward()
 
     def fight(self):
+        '''
+        fight() --> void \n
+        Displays message.
+        '''
         print("There is nothing to fight here...except yourself. You give yourself a good face whacking and move on.")
     
     def __str__(self):
