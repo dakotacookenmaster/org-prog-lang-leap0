@@ -285,7 +285,7 @@ class GameObject:
 
     for f in descriptions:
         try:
-            with open(f"./amaze/room_descriptions/{f}.txt", "r") as f_desc:
+            with open(f"{f}.txt", "r") as f_desc:
                 descriptions[f] = [(i).replace("\n", "") for i in f_desc.readlines() if (i != '' and i != '\n')]
         except Exception:
             print(f"Unable to open {f}. Was it removed?")
