@@ -8,7 +8,9 @@
 
 class VendingMachine():
     def __init__(self):
-        ''' Constructs a VendingMachine object and initializes the inventory to a default 5 x 5. '''
+        ''' 
+        Constructs a VendingMachine object and initializes the inventory to a default 5 x 5. 
+        '''
         self.inventory = {}
         self.row_size = 5
         self.col_size = 5
@@ -34,6 +36,10 @@ class VendingMachine():
                 self.inventory[first_letter + str(col)] = ["Ø (Empty)", "0", "0"]
 
     def sys_help(self, arg_list):
+        ''' 
+        sys_help([]) --> void \n
+        Prints out the list of commands that can be used in the VendingMachine \n
+        '''
         print()
         print("All users have access to the following commands:")
         print("'inventory' --> prints the vending machine's current inventory.")
@@ -54,7 +60,7 @@ class VendingMachine():
 
     def check_arg_count(self, number, arg_list):
         '''
-        check_arg_count(number, arg_list) --> bool
+        check_arg_count([number, arg_list]) --> bool
         Checks whether the current argument count is equal to number. If it is, return True. Otherwise, return False.
         '''
         if len(arg_list) > number:
@@ -67,6 +73,7 @@ class VendingMachine():
 
     def logout(self, arg_list):
         '''
+        logout([]) --> bool \n
         Logs the current user out if they're logged in and returns True. Otherwise, returns False.
         '''
         if self.admin:
@@ -79,8 +86,8 @@ class VendingMachine():
         
     def change_password(self, arg_list):
         '''
-        change_password(NEW_PASSWORD) --> bool \n
-        Change the admin password to NEW_PASSWORD. Returns True upon successful change, False otherwise.
+        change_password(PASSWORD) --> bool \n
+        Change the admin password to what is passed. Returns True upon successful change, False otherwise. \n
         '''
         if self.admin:
             if not self.check_arg_count(1, arg_list):
@@ -99,6 +106,12 @@ class VendingMachine():
             return False
 
     def modify_price(self, arg_list):
+        '''
+        modify_price([SLOT_NUMBER, PRICE]) --> bool \n
+        allows the admin to modify the price of an exsisting item \n
+        if the arguments passed are valid, will change the price and return, True. \n
+        otherwise, will return, False \n
+        '''
         if self.admin:
             if not self.check_arg_count(2, arg_list):
                 return False
@@ -122,6 +135,12 @@ class VendingMachine():
             return False
 
     def increase_quantity(self, arg_list):
+        '''
+        increase_quantity([SLOT_NUMBER, NAME, QUANTITY, PRICE]) --> bool \n
+        Allows the admin to increase the amount of an exsisting item \n
+        if the item is present and the request is formated correctly, returns True \n
+        otherwise, the function will prompt the user and return false \n
+        '''
         if self.admin:
             if not self.check_arg_count(2, arg_list):
                 return False
@@ -145,9 +164,10 @@ class VendingMachine():
         
     def authenticate(self, arg_list):
         """
-        authenticate(password) --> bool
-        Returns True if authentication was successful, else returns False
-        Changes the user mode from user to admin.
+        authenticate(PASSWORD) --> bool \n
+        Returns True if authentication was successful, else returns False \n
+        The returned bool values are used to exit out of the function early, if necessary \n
+        Changes the user mode from user to admin. \n
         """
         if not self.check_arg_count(1, arg_list):
             return False
@@ -161,27 +181,34 @@ class VendingMachine():
             self.auth_failed()
 
     def auth_failed(self):
+        '''
+        auth_failed([]) --> void \n
+        prompts the user that the password that was entered is invalid \n
+        '''
         print("The password you entered was invalid. Please try again.")
 
     def auth_required(self):
+        '''
+        auth_required([]) --> void \n
+        If the user is not logged in as an admin, rejects access. \n
+        '''
         print("You do not have the authorization to execute that command. Type 'admin' followed by your password to enable this feature.")
 
     def sys_exit(self, arg_list):
         '''
-        sys_exit() --> void
-        Exits from the current program.
+        sys_exit([]) --> void \n
+        Exits from the current program. \n
         '''
         if self.admin:
             exit(0)
         else:
             self.auth_required()
 
-    def function_not_implemented(self, arg_list):
-        print("This function has not yet been implemented.")
-
     def purchase_item(self, arg_list):
-        '''purchase_item(item_id) --> bool;
-        When passed an item_id, purchase_item will check if there are items in that item_id to purchase
+        '''purchase_item(SLOT_NUMBER) --> bool; \n
+        When passed an item id, purchase_item will check if there are items in that item id to purchase \n
+        If the item requested is avaliable, proceeds with the purchase and returns true \n
+        otherwise, prompts the user with a message and returns false \n
         '''
         keys = self.inventory.keys()
         if not self.check_arg_count(1, arg_list):
@@ -208,8 +235,8 @@ class VendingMachine():
 
     def request_currency(self, item_id):
         '''
-        request_currency(item_id) --> void
-        Will continually request money until the price is met. Will return change if there is any.
+        request_currency(SLOT_NUMBER) --> void \n
+        Will continually request money until the price is met. Will return change if there is any. \n
         '''
         price = float(self.inventory[item_id][2])
         money = 0
@@ -227,11 +254,12 @@ class VendingMachine():
 
     def add_item(self, arg_list):
         '''
-        add_item([slot_number, name, quantity, price]) --> bool
-        Attempts to add an item to the vending machine inventory.
-        If the item already exists, allows user to choose to replace
-        or cancel the operation. Returns True if the item was added
-        (or replaced), otherwise False. 
+        add_item([slot_number, name, quantity, price]) --> bool \n
+        Attempts to add an item to the vending machine inventory. \n 
+        If the item already exists, allows user to choose to replace \n
+        or cancel the operation. If the item was added \n
+        (or replaced), a prompt will be printed and returns true. \n
+        otherwise, will prompt user and return false. \n
         '''
         if self.admin:
             if not self.check_arg_count(4, arg_list):
@@ -277,7 +305,7 @@ class VendingMachine():
 
     def view_inventory(self, arg_list):
         '''
-        view_inventory(arg_list) --> void \n
+        view_inventory([]) --> void \n
         Prints the current inventory.
         '''
         # Handle dynamic inventory sizing
@@ -309,7 +337,7 @@ class VendingMachine():
 
     def prompt(self):
         '''
-        prompt() --> void
+        prompt([]) --> void
         Prompts the user for commands and attempts to execute them.
         '''
         user_input = input("> ").split()
