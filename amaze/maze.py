@@ -41,6 +41,9 @@ class Fork(Maze):
         print("Unable to move forward. There is only a path to the left and right.")
         return self
 
+    def fight(self):
+        print("Only the spork people fight at forks.")
+
     def move_left(self):
         return self.left
 
@@ -55,13 +58,16 @@ class Fork(Maze):
 
 class DeadEnd(Maze):
     def __init__(self, **kwargs):
-        self.description = str(self)
+        self.description = GameObject.descriptions['deadend']
 
     def move_left(self):
         self.move_forward()
 
     def move_right(self):
         self.move_forward()
+
+    def fight(self):
+        print("There's nothing to fight here.")
 
     def move_forward(self):
         print("You've reached a dead-end. Game Over.")
@@ -84,9 +90,18 @@ class Room(Maze):
                                             depth = self.depth + 1)
         else:
             self.forward = GameObject.get_endpoint()()
+
+    def fight(self):
+        print("You smack your head against the wall. Things start to spin. You decide it's best to stop.")
     
     def move_forward(self):
         return self.forward
+
+    def move_left(self):
+        print("You are unable to move to the left. A wall blocks your path.")
+
+    def move_right(self):
+        print("You are unable to move to the right. A wall blocks your path.")
 
     def __str__(self):
         return "Room"
@@ -96,8 +111,9 @@ class Room(Maze):
 
 class Enemy(Maze):
     def __init__(self, **kwargs):
-        self.description = str(self)
+        self.description = random.choice(GameObject.descriptions['enemy'])
         self.depth = kwargs['depth']
+        self.enemy_dead = False
         if self.depth < GameObject.recursion_limit:
             self.forward = kwargs['forward'](left = GameObject.get_maze(), 
                                             right = GameObject.get_maze(), 
@@ -107,8 +123,25 @@ class Enemy(Maze):
             self.forward = GameObject.get_endpoint()()
 
     def move_forward(self):
-        print("Normally, you'd have to kill an enemy here.")
-        return self.forward
+        if self.enemy_dead:
+            return self.forward
+        else:
+            print("The danger is still in your path! You might fight to move forward!")
+
+    def fight(self):
+        fate = random.choice([True, True, True, True, True, False])
+        if fate:
+            print("By some stroke of luck, you are still alive! The enemy has been defeated, and you can move onwards.")
+            self.description = "The danger has passed. You may now move forward."
+        else:
+            print("Your journey is now over. Rest in peace.")
+            exit(0)
+    
+    def move_left(self):
+        print("You are unable to move to the left. A wall blocks your path.")
+
+    def move_right(self):
+        print("You are unable to move to the right. A wall blocks your path.")
 
     def __str__(self):
         return "Enemy"
@@ -119,11 +152,14 @@ class Enemy(Maze):
 
 class Exit(Maze):
     def __init__(self, **kwargs):
-        self.description = str(self)
+        self.description = random.choice(GameObject.descriptions['exit'])
 
     def move_forward(self):
         print("You made it out!")
         exit(0)
+
+    def fight(self):
+        print("There is nothing to fight here...except yourself. You give yourself a good face whacking and move on.")
     
     def __str__(self):
         return "Exit"
@@ -143,6 +179,9 @@ class GameObject:
 
     descriptions = {
         'fork': [],
+        'exit': [],
+        'deadend': [],
+        'enemy': [],
         'exit': [],
     }
     recursion_limit = 10
@@ -166,7 +205,8 @@ class GameObject:
             "FORWARD": self.move_forward,
             "LEFT": self.move_left,
             "RIGHT": self.move_right,
-            "MAP": self.map
+            "FIGHT": self.fight
+            # "MAP": self.map
         }
 
 
@@ -184,6 +224,8 @@ class GameObject:
     #         print(" " * tab_level, end="")
     #         print(f"{self.map(maze.forward, tab_level + 1)}")
 
+    def fight(self):
+        self.maze.fight()
 
     def elaborate(self):
         self.maze.elaborate()
@@ -219,6 +261,7 @@ class GameObject:
 
 # Define the global GameObject
 mazeGame = GameObject()
+print("Welcome to the maze of mystery! Inside, you may live, die, or escape. The journey is the destination!")
 # print(repr(mazeGame.maze))
 while True:
     mazeGame.prompt()
