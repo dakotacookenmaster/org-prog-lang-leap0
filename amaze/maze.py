@@ -303,13 +303,10 @@ class GameObject:
             "FORWARD": self.move_forward,
             "LEFT": self.move_left,
             "RIGHT": self.move_right,
-            "FIGHT": self.fight
-            # "MAP": self.map
+            "FIGHT": self.fight,
+            "HELP": self.help,
         }
 
-
-    # Define commands here instead of linking directly to Maze class to allow custom handling
-    # of the results.
     # def map(self, maze = False, tab_level = 1):
     #     if not maze:
     #         maze = self.maze
@@ -322,6 +319,11 @@ class GameObject:
     #         print(" " * tab_level, end="")
     #         print(f"{self.map(maze.forward, tab_level + 1)}")
 
+    ###########################################################################################
+    # Define commands here instead of linking directly to Maze class to allow custom handling #
+    # of the results.                                                                         #
+    ###########################################################################################
+    
     def fight(self):
         self.maze.fight()
 
@@ -344,6 +346,14 @@ class GameObject:
         else:
             print("You've entered an invalid command. Type 'help' to see what commands are available.")
 
+    def help(self):
+        print("'help' --> brings up this help context.")
+        print("'look' --> prints information about the room you're currently in.")
+        print("'fight' --> engages in hand-to-hand combat with potential assailants.")
+        print("'forward' --> allows the user to move forward if possible.")
+        print("'left' --> allows the user to move to the left if possible.")
+        print("'right' --> allows the user to move to the right if possible.")
+
     @staticmethod
     def set_recursion_limit(new_limit):
         GameObject.recursion_limit = new_limit
@@ -359,7 +369,9 @@ class GameObject:
 
 # Define the global GameObject
 mazeGame = GameObject()
+print()
 print("Welcome to the maze of mystery! Inside, you may live, die, or escape. The journey is the destination!")
-print(repr(mazeGame.maze))
-# while True:
-#     mazeGame.prompt()
+print("Type 'help' to learn what commands you can use.")
+print()
+while True:
+    mazeGame.prompt()
