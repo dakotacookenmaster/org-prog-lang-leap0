@@ -6,6 +6,8 @@
 #   Michael Yoon
 # Last edit: 02/26/2020
 
+debug = True #Make True to run tests
+
 class VendingMachine():
     def __init__(self):
         ''' 
@@ -346,6 +348,45 @@ class VendingMachine():
             self.commands[user_input[0]](user_input[1::])
         else:
             print(f"{user_input[0]} is not a valid command. For a list of valid commands, please type 'help'.")
+
+
+if debug:
+    ##################################
+    ############ Tests ###############
+    ##################################
+
+    #check_arg_count()
+    vm = VendingMachine()
+    test_list = ["hi", "there", "test"]
+    test = vm.check_arg_count(3, test_list)
+    assert test, f"check_arg_count failed."
+
+    test_list = [1, 2, 4, 5, 6, 1, 5]
+    test = vm.check_arg_count(2, test_list)
+    assert not test, f"check_arg_count failed"
+
+    test = vm.check_arg_count(19, test_list)
+    assert not test, f"check_arg_count failed"
+
+    #logout()
+    vm.admin = True
+    test = vm.logout([])
+    assert test, f"logout() failed"
+
+    vm.admin = False
+    test = vm.logout([])
+    assert not test, f"logout() failed"
+
+    #change_password
+    vm.admin = True
+    test = vm.change_password(["change"])
+    assert test, f"change_password() failed"
+
+    vm.admin = False
+    test = vm.change_password(["NEW_PASSWORD!"])
+    assert not test, f"change_password() failed"
+
+    
 
 
 MY_VEN = VendingMachine()
