@@ -355,7 +355,7 @@ if debug:
     ############ Tests ###############
     ##################################
 
-    #check_arg_count()
+    # check_arg_count
     vm = VendingMachine()
     test_list = ["hi", "there", "test"]
     test = vm.check_arg_count(3, test_list)
@@ -368,23 +368,30 @@ if debug:
     test = vm.check_arg_count(19, test_list)
     assert not test, f"check_arg_count failed"
 
-    #logout()
+    # logout
     vm.admin = True
     test = vm.logout([])
-    assert test, f"logout() failed"
+    assert test, f"logout() failed in {vm}."
 
     vm.admin = False
     test = vm.logout([])
-    assert not test, f"logout() failed"
+    assert not test, f"logout() failed in {vm}."
 
-    #change_password
+    # change_password
     vm.admin = True
     test = vm.change_password(["change"])
-    assert test, f"change_password() failed"
+    assert test, f"change_password() failed in {vm}."
 
     vm.admin = False
     test = vm.change_password(["NEW_PASSWORD!"])
-    assert not test, f"change_password() failed"
+    assert not test, f"change_password() failed in {vm}."
+
+    # add_item
+    vm.add_item(['a0', 'peanut_butter_crisps', '10', '1.50'])
+    assert vm.inventory['A0'] == ['Ø (Empty)', '0', '0'], f"Erroneously allowed non-admin user to add items to inventory in {vm}."
+    vm.admin = True
+    vm.add_item(['a0', 'peanut_butter_crisps', '10', '1.50'])
+    assert vm.inventory['A0'] == ['Peanut Butter Crisps', '10', '1.50'], f"add_item() failed in {vm}."
 
     #modify_price()
     vm.admin = True
