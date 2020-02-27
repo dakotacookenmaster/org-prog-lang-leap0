@@ -6,8 +6,10 @@
 #   Michael Yoon
 # Last edit: 02/26/2020
 # Note: The random library is included in the Python Standard Library (https://docs.python.org/3.3/library/random.html)
+# We realize that we are supposed to include what is *absolutely* necessary, and we would argue that it is. I have no way to access
+# the hardware for microtime (unless I include the time library), and writing a random function would simply copy what already exists.
+# We simply include this one module from the standard library to make some random choices about which maze section will spawn next.
 import random
-import os
 
 class Maze:
     """ Top-level parent for Maze variants. """
@@ -19,17 +21,17 @@ class Maze:
 
 class Fork(Maze):
     def __init__(self, **kwargs):
-        self.description = random.choice(GameObject.fork)
+        self.description = random.choice(GameObject.descriptions['fork'])
         self.depth = kwargs['depth']
         if self.depth < GameObject.recursion_limit:
-            self.left = kwargs['left'](left = GameObject.build_maze(), 
-                                    right = GameObject.build_maze(), 
-                                    forward = GameObject.build_maze(),
+            self.left = kwargs['left'](left = GameObject.get_maze(), 
+                                    right = GameObject.get_maze(), 
+                                    forward = GameObject.get_maze(),
                                     depth = self.depth + 1)
 
-            self.right = kwargs['right'](left = GameObject.build_maze(), 
-                                        right = GameObject.build_maze(), 
-                                        forward = GameObject.build_maze(),
+            self.right = kwargs['right'](left = GameObject.get_maze(), 
+                                        right = GameObject.get_maze(), 
+                                        forward = GameObject.get_maze(),
                                         depth = self.depth + 1)
         else:
             self.left = GameObject.get_endpoint()()
@@ -55,6 +57,12 @@ class DeadEnd(Maze):
     def __init__(self, **kwargs):
         self.description = str(self)
 
+    def move_left(self):
+        self.move_forward()
+
+    def move_right(self):
+        self.move_forward()
+
     def move_forward(self):
         print("You've reached a dead-end. Game Over.")
         exit(0)
@@ -70,9 +78,9 @@ class Room(Maze):
         self.description = str(self)
         self.depth = kwargs['depth']
         if self.depth < GameObject.recursion_limit:
-            self.forward = kwargs['forward'](left = GameObject.build_maze(), 
-                                            right = GameObject.build_maze(), 
-                                            forward = GameObject.build_maze(),
+            self.forward = kwargs['forward'](left = GameObject.get_maze(), 
+                                            right = GameObject.get_maze(), 
+                                            forward = GameObject.get_maze(),
                                             depth = self.depth + 1)
         else:
             self.forward = GameObject.get_endpoint()()
@@ -91,9 +99,9 @@ class Enemy(Maze):
         self.description = str(self)
         self.depth = kwargs['depth']
         if self.depth < GameObject.recursion_limit:
-            self.forward = kwargs['forward'](left = GameObject.build_maze(), 
-                                            right = GameObject.build_maze(), 
-                                            forward = GameObject.build_maze(),
+            self.forward = kwargs['forward'](left = GameObject.get_maze(), 
+                                            right = GameObject.get_maze(), 
+                                            forward = GameObject.get_maze(),
                                             depth = self.depth + 1)
         else:
             self.forward = GameObject.get_endpoint()()
@@ -133,22 +141,24 @@ class GameObject:
         Exit
     ]
 
+    descriptions = {
+        'fork': [],
+        'exit': [],
+    }
     recursion_limit = 10
 
-    files = ["fork.txt"]
-
-    for f in files:
+    for f in descriptions:
         try:
-            with open(f"./amaze/room_descriptions/{f}", "r") as f_desc:
-                fork = [(i).replace("\n", "") for i in f_desc.readlines() if (i != '' and i != '\n')]
+            with open(f"./amaze/room_descriptions/{f}.txt", "r") as f_desc:
+                descriptions[f] = [(i).replace("\n", "") for i in f_desc.readlines() if (i != '' and i != '\n')]
         except Exception:
             print(f"Unable to open {f}. Was it removed?")
             exit(0)
 
     def __init__(self):
-        self.maze = Fork(left = GameObject.build_maze(), 
-                         right = GameObject.build_maze(),
-                         forward = GameObject.build_maze(),
+        self.maze = Fork(left = GameObject.get_maze(), 
+                         right = GameObject.get_maze(),
+                         forward = GameObject.get_maze(),
                          depth = 0)
 
         self.commands = {
@@ -156,11 +166,25 @@ class GameObject:
             "FORWARD": self.move_forward,
             "LEFT": self.move_left,
             "RIGHT": self.move_right,
+            "MAP": self.map
         }
 
 
     # Define commands here instead of linking directly to Maze class to allow custom handling
     # of the results.
+    # def map(self, maze = False, tab_level = 1):
+    #     if not maze:
+    #         maze = self.maze
+    #     if str(maze) == "Fork":
+    #         print(" " * tab_level, end="")
+    #         print(f"{self.map(maze.left, tab_level + 1)} <== {self.maze} ==> {self.map(maze.right, tab_level + 1)}")
+    #     elif str(maze) == "Room":
+    #         print(" " * tab_level, end="")
+    #         print("||")
+    #         print(" " * tab_level, end="")
+    #         print(f"{self.map(maze.forward, tab_level + 1)}")
+
+
     def elaborate(self):
         self.maze.elaborate()
 
@@ -189,7 +213,7 @@ class GameObject:
         return random.choice([DeadEnd, Exit])
 
     @staticmethod
-    def build_maze():
+    def get_maze():
         return random.choice(GameObject.maze_variants)
 
 
