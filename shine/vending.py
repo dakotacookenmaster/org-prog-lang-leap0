@@ -6,6 +6,8 @@
 #   Michael Yoon
 # Last edit: 02/26/2020
 
+debug = True # Make True to run tests
+
 class VendingMachine():
     def __init__(self):
         ''' 
@@ -34,6 +36,20 @@ class VendingMachine():
             first_letter = chr(65 + row)
             for col in range(self.col_size):
                 self.inventory[first_letter + str(col)] = ["Ø (Empty)", "0", "0"]
+
+    def __repr__(self):
+        '''
+        repr(VendingMachine) --> String \n
+        Returns a string representation of the object's definition
+        '''
+        return "VendingMachine()"
+
+    def __str__(self):
+        '''
+        str(VendingMachine) --> String \n
+        Returns a string reprentation of the object.
+        '''
+        return "VendingMachine"
 
     def sys_help(self, arg_list):
         ''' 
@@ -136,10 +152,10 @@ class VendingMachine():
 
     def increase_quantity(self, arg_list):
         '''
-        increase_quantity([SLOT_NUMBER, NAME, QUANTITY, PRICE]) --> bool \n
+        increase_quantity([SLOT_NUMBER, QUANTITY]) --> bool \n
         Allows the admin to increase the amount of an exsisting item \n
         if the item is present and the request is formated correctly, returns True \n
-        otherwise, the function will prompt the user and return false \n
+        otherwise, the function will prompt the user and return false
         '''
         if self.admin:
             if not self.check_arg_count(2, arg_list):
@@ -177,8 +193,10 @@ class VendingMachine():
         if pw == self.admin_password:
             self.admin = True
             print("Authentication was successful.")
+            return True
         else:
             self.auth_failed()
+            return False
 
     def auth_failed(self):
         '''
@@ -347,6 +365,107 @@ class VendingMachine():
         else:
             print(f"{user_input[0]} is not a valid command. For a list of valid commands, please type 'help'.")
 
+
+if debug:
+    ##################################
+    ############ Tests ###############
+    ##################################
+
+    # check_arg_count
+    vm = VendingMachine()
+    test_list = ["hi", "there", "test"]
+    test = vm.check_arg_count(3, test_list)
+    assert test, f"check_arg_count failed in {vm}"
+
+    test_list = [1, 2, 4, 5, 6, 1, 5]
+    test = vm.check_arg_count(2, test_list)
+    assert not test, f"check_arg_count failed in {vm}"
+
+    test = vm.check_arg_count(19, test_list)
+    assert not test, f"check_arg_count failed in {vm}"
+
+    # logout
+    vm.admin = True
+    test = vm.logout([])
+    assert test, f"logout() failed in {vm}."
+
+    vm.admin = False
+    test = vm.logout([])
+    assert not test, f"logout() failed in {vm}."
+
+    # change_password
+    vm.admin = True
+    test = vm.change_password(["change"])
+    assert test, f"change_password() failed in {vm}."
+
+    vm.admin = False
+    test = vm.change_password(["NEW_PASSWORD!"])
+    assert not test, f"change_password() failed in {vm}."
+
+    # add_item
+    vm.admin = False
+    vm.add_item(['b0', 'peanut_butter_crisps', '10', '1.50'])
+    assert vm.inventory['B0'] == ['Ø (Empty)', '0', '0'], f"Erroneously allowed non-admin user to add items to inventory in {vm}."
+
+    vm.admin = True
+    vm.add_item(['B0', 'peanut_butter_crisps', '10', '1.50'])
+    assert vm.inventory['B0'] == ['Peanut Butter Crisps', '10', '1.50'], f"add_item() failed in {vm}."
+
+    vm.admin = True
+    vm.add_item(['b1', 'chocolate_bar', '10', '1.50'])
+    assert vm.inventory['B1'] == ['Chocolate Bar', '10', '1.50'], f"add_item() failed in {vm}."
+
+    # purchase_item
+    vm.admin = False
+    test = vm.purchase_item(["D0"])
+    assert not test, f"Erroneously allowed purchase of empty slot in {vm}."
+
+    # Cannot test purchase_item procedurally (requires user input for money). Please test manually.
+
+    # modify_price()
+    vm.admin = True
+    vm.add_item(["A0", "bag'o_chips", "5", "5.00"])
+    test = vm.modify_price(["A0", "9.00"])
+    assert test, f"modify_price() failed in {vm}"
+
+    vm.admin = True
+    test = vm.modify_price(["Hello", "5.00"])
+    assert not test, f"modify_price() failed in {vm}"
+
+    vm.admin = False
+    test = vm.modify_price(["A9", "300"])
+    assert not test, f"modify_price() failed in {vm}"
+
+    # increase_quantity()
+    vm.admin = True
+    vm.add_item(["A1", "bag'o_chips", "5", "5.00"])
+    test = vm.increase_quantity(["A1", "9000"])
+    assert test, f"increase_quantity() failed in {vm}"
+
+    vm.admin = False
+    vm.add_item(["A4", "bag'o_chips", "5", "5.00"])
+    test = vm.increase_quantity(["A4", "9000"])
+    assert not test, f"increase_quantity() failed in {vm}"
+
+    vm.admin = True
+    vm.add_item(["A3", "bag'o_chips", "5", "5.00"])
+    test = vm.increase_quantity(["A2", "9000"])
+    assert not test, f"increase_quantity() failed in {vm}"
+
+    # authenticate()
+    test = vm.authenticate(["change"])
+    assert test, f"authenticate() failed in {vm}"
+    
+    test = vm.authenticate(["Password"])
+    assert not test, f"authenticate() failed in {vm}"
+
+    #repr()
+    test = repr(vm)
+    assert test == "VendingMachine()", f"repr() failed in {vm}"
+
+    # str()
+    test = str(vm)
+    assert test == "VendingMachine", f"str() failed in {vm}."
 
 MY_VEN = VendingMachine()
 
