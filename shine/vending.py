@@ -38,7 +38,7 @@ class VendingMachine():
                 self.inventory[first_letter + str(col)] = ["Ø (Empty)", "0", "0"]
 
     def __str__(self):
-        return self.view_inventory()
+        return "VendingMachine"
 
     def sys_help(self, arg_list):
         ''' 
