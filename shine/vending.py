@@ -6,7 +6,7 @@
 #   Michael Yoon
 # Last edit: 02/26/2020
 
-debug = False # Make True to run tests
+debug = True # Make True to run tests
 
 class VendingMachine():
     def __init__(self):
@@ -371,14 +371,14 @@ if debug:
     vm = VendingMachine()
     test_list = ["hi", "there", "test"]
     test = vm.check_arg_count(3, test_list)
-    assert test, f"check_arg_count failed."
+    assert test, f"check_arg_count failed in {vm}"
 
     test_list = [1, 2, 4, 5, 6, 1, 5]
     test = vm.check_arg_count(2, test_list)
-    assert not test, f"check_arg_count failed"
+    assert not test, f"check_arg_count failed in {vm}"
 
     test = vm.check_arg_count(19, test_list)
-    assert not test, f"check_arg_count failed"
+    assert not test, f"check_arg_count failed in {vm}"
 
     # logout
     vm.admin = True
@@ -422,38 +422,42 @@ if debug:
     vm.admin = True
     vm.add_item(["A0", "bag'o_chips", "5", "5.00"])
     test = vm.modify_price(["A0", "9.00"])
-    assert test, f"modify_price() failed"
+    assert test, f"modify_price() failed in {vm}"
 
     vm.admin = True
     test = vm.modify_price(["Hello", "5.00"])
-    assert not test, f"modify_price() failed"
+    assert not test, f"modify_price() failed in {vm}"
 
     vm.admin = False
     test = vm.modify_price(["A9", "300"])
-    assert not test, f"modify_price() failed"
+    assert not test, f"modify_price() failed in {vm}"
 
     #increase_quantity()
     vm.admin = True
     vm.add_item(["A1", "bag'o_chips", "5", "5.00"])
     test = vm.increase_quantity(["A1", "9000"])
-    assert test, f"increase_quantity() failed"
+    assert test, f"increase_quantity() failed in {vm}"
 
     vm.admin = False
     vm.add_item(["A4", "bag'o_chips", "5", "5.00"])
     test = vm.increase_quantity(["A4", "9000"])
-    assert not test, f"increase_quantity() failed"
+    assert not test, f"increase_quantity() failed in {vm}"
 
     vm.admin = True
     vm.add_item(["A3", "bag'o_chips", "5", "5.00"])
     test = vm.increase_quantity(["A2", "9000"])
-    assert not test, f"increase_quantity() failed"
+    assert not test, f"increase_quantity() failed in {vm}"
 
     #authenticate()
     test = vm.authenticate(["change"])
-    assert test, f"authenticate() failed"
+    assert test, f"authenticate() failed in {vm}"
     
     test = vm.authenticate(["Password"])
-    assert not test, f"authenticate() failed"
+    assert not test, f"authenticate() failed in {vm}"
+
+    #repr()
+    test = repr(vm)
+    assert test == "VendingMachine()", f"repr() failed in {vm}"
 
 
 
