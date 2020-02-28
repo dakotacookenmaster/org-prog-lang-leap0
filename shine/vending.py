@@ -37,6 +37,13 @@ class VendingMachine():
             for col in range(self.col_size):
                 self.inventory[first_letter + str(col)] = ["Ø (Empty)", "0", "0"]
 
+    def __repr__(self):
+        '''
+        repr(VendingMachine) --> String \n
+        Returns a string representation of the object's definition
+        '''
+        return "VendingMachine()"
+
     def __str__(self):
         '''
         str(VendingMachine) --> String \n
@@ -455,8 +462,6 @@ if debug:
     # str()
     test = str(vm)
     assert test == "VendingMachine", f"str() failed in {vm}."
-
-    
 
 MY_VEN = VendingMachine()
 
