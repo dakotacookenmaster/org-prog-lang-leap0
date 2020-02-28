@@ -6,7 +6,7 @@
 #   Michael Yoon
 # Last edit: 02/26/2020
 
-debug = True #Make True to run tests
+debug = False # Make True to run tests
 
 class VendingMachine():
     def __init__(self):
@@ -36,6 +36,9 @@ class VendingMachine():
             first_letter = chr(65 + row)
             for col in range(self.col_size):
                 self.inventory[first_letter + str(col)] = ["Ø (Empty)", "0", "0"]
+
+    def __str__(self):
+        return self.view_inventory()
 
     def sys_help(self, arg_list):
         ''' 
@@ -405,6 +408,8 @@ if debug:
     vm.admin = False
     test = vm.purchase_item(["D0"])
     assert not test, f"Erroneously allowed purchase of empty slot in {vm}."
+
+    # Cannot test purchase_item procedurally (requires user input for money). Please test manually.
 
     #modify_price()
     vm.admin = True
