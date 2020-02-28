@@ -179,8 +179,10 @@ class VendingMachine():
         if pw == self.admin_password:
             self.admin = True
             print("Authentication was successful.")
+            return True
         else:
             self.auth_failed()
+            return False
 
     def auth_failed(self):
         '''
@@ -406,21 +408,22 @@ if debug:
 
     #modify_price()
     vm.admin = True
-    test = vm.modify_price(["A0", 5.00])
+    vm.add_item(["A0", "bag'o_chips", "5", "5.00"])
+    test = vm.modify_price(["A0", "9.00"])
     assert test, f"modify_price() failed"
 
     vm.admin = True
-    test = vm.modify_price(["Hello", 5.00])
+    test = vm.modify_price(["Hello", "5.00"])
     assert not test, f"modify_price() failed"
 
     vm.admin = False
-    test = vm.modify_price(["A9", 300])
+    test = vm.modify_price(["A9", "300"])
     assert not test, f"modify_price() failed"
 
     #increase_quantity()
     vm.admin = True
-    vm.add_item(["A0", "bag'o_chips", "5", "5.00"])
-    test = vm.increase_quantity(["A0", "9000"])
+    vm.add_item(["A1", "bag'o_chips", "5", "5.00"])
+    test = vm.increase_quantity(["A1", "9000"])
     assert test, f"increase_quantity() failed"
 
     vm.admin = False
@@ -430,15 +433,17 @@ if debug:
 
     vm.admin = True
     vm.add_item(["A3", "bag'o_chips", "5", "5.00"])
-    test = vm.increase_quantity(["A1", "9000"])
+    test = vm.increase_quantity(["A2", "9000"])
     assert not test, f"increase_quantity() failed"
 
     #authenticate()
-    test = vm.authenticate("admin")
+    test = vm.authenticate(["change"])
     assert test, f"authenticate() failed"
     
-    test = vm.authenticate("Password")
+    test = vm.authenticate(["Password"])
     assert not test, f"authenticate() failed"
+
+    
 
 MY_VEN = VendingMachine()
 
