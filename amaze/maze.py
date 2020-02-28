@@ -11,7 +11,7 @@
 # We simply include this one module from the standard library to make some random choices about which maze section will spawn next.
 import random
 
-debug = True # make True to run tests
+debug = False # make True to run tests
 
 class Maze:
     """ Top-level parent for Maze variants. """

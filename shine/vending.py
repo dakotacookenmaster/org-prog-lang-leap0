@@ -6,7 +6,7 @@
 #   Michael Yoon
 # Last edit: 02/26/2020
 
-debug = True # Make True to run tests
+debug = False # Make True to run tests
 
 class VendingMachine():
     def __init__(self):
