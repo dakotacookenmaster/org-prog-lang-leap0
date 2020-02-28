@@ -38,6 +38,10 @@ class VendingMachine():
                 self.inventory[first_letter + str(col)] = ["Ø (Empty)", "0", "0"]
 
     def __str__(self):
+        '''
+        str(VendingMachine) --> String \n
+        Returns a string reprentation of the object.
+        '''
         return "VendingMachine"
 
     def sys_help(self, arg_list):
@@ -411,7 +415,7 @@ if debug:
 
     # Cannot test purchase_item procedurally (requires user input for money). Please test manually.
 
-    #modify_price()
+    # modify_price()
     vm.admin = True
     vm.add_item(["A0", "bag'o_chips", "5", "5.00"])
     test = vm.modify_price(["A0", "9.00"])
@@ -425,7 +429,7 @@ if debug:
     test = vm.modify_price(["A9", "300"])
     assert not test, f"modify_price() failed"
 
-    #increase_quantity()
+    # increase_quantity()
     vm.admin = True
     vm.add_item(["A1", "bag'o_chips", "5", "5.00"])
     test = vm.increase_quantity(["A1", "9000"])
@@ -441,12 +445,16 @@ if debug:
     test = vm.increase_quantity(["A2", "9000"])
     assert not test, f"increase_quantity() failed"
 
-    #authenticate()
+    # authenticate()
     test = vm.authenticate(["change"])
     assert test, f"authenticate() failed"
     
     test = vm.authenticate(["Password"])
     assert not test, f"authenticate() failed"
+
+    # str()
+    test = str(vm)
+    assert test == "VendingMachine", f"str() failed in {vm}."
 
     
 
